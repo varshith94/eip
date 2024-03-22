@@ -5,13 +5,13 @@ resource "aws_route_table" "privatert" {
     gateway_id = aws_nat_gateway.gw.id
   }
   tags = {
-    Name ="${var.vpc_name}-ngw"
+    Name = "${var.vpc_name}-ngw"
   }
 
 }
 resource "aws_route_table_association" "privateassociate" {
-    count = 3
-    subnet_id = element(aws_subnet.privatesubnets.*.id,count.index)
-    route_table_id = aws_route_table.privatert.id
-  
+  count          = 3
+  subnet_id      = element(aws_subnet.privatesubnets.*.id, count.index)
+  route_table_id = aws_route_table.privatert.id
+
 }
