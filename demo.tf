@@ -16,6 +16,12 @@ resource "aws_lb_target_group_attachment" "attachtg" {
     port = 8080
   
 }
+resource "aws_lb_target_group_attachment" "attachtg1" {
+    target_group_arn = aws_lb_target_group.dev.arn
+    target_id = aws_instance.privateserver[0].id
+    port = 8080
+  
+}
 
 resource "aws_lb" "networklb" {
     name = "grahanlb"
