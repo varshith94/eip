@@ -1,3 +1,3 @@
-# resource "aws_eip" "lb" {
-#   domain = "vpc"
-# }
+resource "aws_eip" "lb" {
+  domain = "vpc"
+}
