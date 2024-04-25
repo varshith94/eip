@@ -10,24 +10,21 @@ resource "aws_instance" "publicserver" {
      
   user_data = <<-EOF
   #!/bin/bash
-  sudo apt update -y
-  sudo apt install openjdk-11-jre-headless -y
-  curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-  sudo apt-get update -y
-  sudo apt-get install jenkins -y
-  
-  EOF
+yum update -y
+set -e
+terraform "$@"
+amazon-linux-extras install nginx1.12 -y
+service nginx start
+echo "<div><h1>PUBLIC-SERVER</h1></div>" >> /usr/share/nginx/html/index.html
+
+EOF
 tags = {
-    Name = "${var.vpc_name}-jenkinsserver"
+    Name = "${var.vpc_name}-publicserver"
 }
 }
 
 resource "aws_instance" "privateserver" {
-    count =2
+    count =1
     ami = var.ami
     instance_type = var.instance_type
     key_name = var.key_name
@@ -35,21 +32,16 @@ resource "aws_instance" "privateserver" {
     subnet_id = element(aws_subnet.privatesubnets[*].id,count.index)
     # private_ip = var.private1_ip
     iam_instance_profile = var.iam_profile
-     
-  user_data = <<-EOF
-  #!/bin/bash
-  sudo apt update -y
-  sudo apt install openjdk-11-jre-headless -y
-  curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-  sudo apt-get update -y
-  sudo apt-get install jenkins -y
-  
-  EOF
+     user_data = <<-EOF
+#!/bin/bash
+yum update -y
+set -e
+terraform "$@"
+amazon-linux-extras install nginx1.12 -y
+service nginx start
+echo "<div><h1>PRIVATE-SERVER</h1></div>" >> /usr/share/nginx/html/index.html
+EOF
 tags = {
-    Name = "${var.vpc_name}-jenkinsprivateserver"
+    Name = "${var.vpc_name}-privateserver"
 }
 }
